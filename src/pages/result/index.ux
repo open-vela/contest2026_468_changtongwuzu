@@ -1,0 +1,301 @@
+<template>
+
+  <div class="page">
+
+    <div class="content">
+
+      <!-- 标题 -->
+      <text class="title">
+        游戏结束
+      </text>
+
+
+      <!-- 游戏成果 -->
+      <div class="stats">
+
+        <!-- 本局得分 -->
+        <div class="stat-item">
+
+          <text class="stat-label">
+            本局得分
+          </text>
+
+          <text class="stat-value">
+            {{score}}
+          </text>
+
+        </div>
+
+
+        <!-- 成功躲避障碍次数 -->
+        <div class="stat-item">
+
+          <text class="stat-label">
+            成功躲避
+          </text>
+
+          <text class="stat-value">
+            {{avoidCount}} 次
+          </text>
+
+        </div>
+
+
+        <!-- 运动时长 -->
+        <div class="stat-item">
+
+          <text class="stat-label">
+            运动时长
+          </text>
+
+          <text class="stat-value">
+            {{formatDuration(duration)}}
+          </text>
+
+        </div>
+
+
+        <!-- 消耗卡路里 -->
+        <div class="stat-item">
+
+          <text class="stat-label">
+            消耗卡路里
+          </text>
+
+          <text class="stat-value">
+            {{calories}} 千卡
+          </text>
+
+        </div>
+
+      </div>
+
+
+      <!-- 数据说明 -->
+      <text class="disclaimer">
+        仅估算，非医疗数据
+      </text>
+
+
+      <!-- 两个按钮 -->
+      <div class="btn-group">
+
+        <!-- 再来一局 -->
+        <div
+          class="btn btn-primary"
+          onclick="playAgain"
+        >
+
+          <text class="btn-text">
+            再来一局
+          </text>
+
+        </div>
+
+
+        <!-- 返回主页 -->
+        <div
+          class="btn btn-secondary"
+          onclick="goHome"
+        >
+
+          <text class="btn-text">
+            返回主页
+          </text>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</template>
+
+
+<style>
+
+.page {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: #000000;
+  padding: 45px 35px;
+}
+
+
+.content {
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.title {
+  font-size: 36px;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 25px;
+}
+
+
+.stats {
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+
+.stat-item {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+
+.stat-label {
+  font-size: 20px;
+  color: #888888;
+  width: 130px;
+}
+
+
+.stat-value {
+  font-size: 24px;
+  color: #FFFFFF;
+  font-weight: bold;
+  width: 130px;
+  text-align: right;
+}
+
+
+.disclaimer {
+  font-size: 16px;
+  color: #666666;
+  margin-bottom: 22px;
+}
+
+
+.btn-group {
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.btn {
+  width: 220px;
+  height: 54px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 27px;
+  margin-bottom: 14px;
+}
+
+
+.btn-primary {
+  background-color: #4CAF50;
+}
+
+
+.btn-secondary {
+  background-color: #333333;
+}
+
+
+.btn-text {
+  font-size: 24px;
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+</style>
+
+
+<script>
+
+import router from '@system.router'
+
+
+export default {
+
+  protected: {
+
+    score: 0,
+
+    duration: 0,
+
+    calories: 0,
+
+    avoidCount: 0
+
+  },
+
+
+  onInit(params) {
+
+    if (!params) return
+
+    if (params.score !== undefined) {
+
+      this.score = Number(params.score)
+
+    }
+
+    if (params.avoidCount !== undefined) {
+
+      this.avoidCount = Number(params.avoidCount)
+
+    }
+
+    if (params.duration !== undefined) {
+
+      this.duration = Number(params.duration)
+
+    }
+
+    if (params.calories !== undefined) {
+
+      this.calories = Number(params.calories)
+
+    }
+
+  },
+
+
+  formatDuration(seconds) {
+
+    const mins = Math.floor(seconds / 60)
+
+    const secs = seconds % 60
+
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+
+  },
+
+
+  playAgain() {
+
+    router.replace({
+
+      uri: '/pages/prepare/index'
+
+    })
+
+  },
+
+
+  goHome() {
+
+    router.replace({
+
+      uri: '/pages/menu/index'
+
+    })
+
+  }
+
+}
+
+</script>

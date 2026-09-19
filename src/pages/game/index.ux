@@ -1,0 +1,1181 @@
+<template>
+
+  <div class="page">
+
+    <div class="game-area">
+
+      <!-- 背景 -->
+      <div class="bg-wrap">
+
+        <image
+          class="bg-img"
+          src="/common/images/bg-scroll-1094x500.jpg"
+          style="
+            left: {{bgOffset}}px;
+            top: {{bgTop}}px;
+          "
+        />
+
+        <image
+          class="bg-img"
+          src="/common/images/bg-scroll-1094x500.jpg"
+          style="
+            left: {{bgOffset2}}px;
+            top: {{bgTop}}px;
+          "
+        />
+
+      </div>
+
+
+      <div class="game-content">
+
+        <!-- HUD -->
+        <div class="hud">
+
+          <image
+            class="life-bird life-bird-1"
+            src="/common/images/bird2.png"
+            style="opacity: {{life >= 1 ? 1 : 0.15}};"
+          />
+          <image
+            class="life-bird life-bird-2"
+            src="/common/images/bird2.png"
+            style="opacity: {{life >= 2 ? 1 : 0.15}};"
+          />
+          <image
+            class="life-bird life-bird-3"
+            src="/common/images/bird2.png"
+            style="opacity: {{life >= 3 ? 1 : 0.15}};"
+          />
+
+          <text class="score">
+            {{score}}
+          </text>
+
+        </div>
+
+
+        <!-- 玩家 -->
+        <image
+          class="character"
+          src="{{charImg}}"
+          style="
+            left: {{charX}}px;
+            top: {{charTop}}px;
+            width: {{charW}}px;
+            height: {{charH}}px;
+          "
+        />
+
+
+        <!-- 蜜蜂 -->
+        <image
+          if="{{obsVisible}}"
+          class="bee"
+          src="/common/images/bee.png"
+          style="
+            left: {{obsX}}px;
+            top: {{obsY}}px;
+            width: {{obsW}}px;
+            height: {{obsH}}px;
+          "
+        />
+
+
+        <!-- 动作提示 -->
+        <div
+          if="{{promptVisible}}"
+          class="prompt"
+        >
+
+          <text class="prompt-text">
+            {{promptText}}
+          </text>
+
+        </div>
+
+
+        <!-- 游戏结束覆盖层 -->
+        <div if="{{showGameOver}}" class="gameover-overlay">
+          <text class="gameover-title">游戏结束</text>
+          <text class="gameover-stat">得分: {{finalScore}}</text>
+          <text class="gameover-stat">躲避障碍: {{finalAvoidCount}}次</text>
+          <text class="gameover-stat">运动时长: {{fmtDuration}}</text>
+          <text class="gameover-stat">消耗: {{finalCalories}}卡路里</text>
+          <text class="gameover-note">*仅估算，非医疗数据</text>
+          <text class="gameover-btn" onclick="onPlayAgain">再来一局</text>
+          <text class="gameover-btn gameover-btn-secondary" onclick="onGoHome">返回主页</text>
+        </div>
+
+        <!-- 控制按钮 -->
+        <div if="{{!showGameOver}}" class="controls">
+
+          <div
+            class="control-btn"
+            onclick="onJumpClick"
+          >
+            <text class="control-text">
+              跳
+            </text>
+          </div>
+
+          <div
+            class="control-btn run-btn"
+            onclick="onRunClick"
+          >
+            <text class="control-text">
+              跑
+            </text>
+          </div>
+
+          <div
+            class="control-btn"
+            onclick="onSquatClick"
+          >
+            <text class="control-text">
+              蹲
+            </text>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</template>
+
+
+<style>
+
+.page {
+  width: 466px;
+  height: 466px;
+  background-color: #28a9e8;
+  overflow: hidden;
+}
+
+.game-area {
+  position: absolute;
+  left: -17px;
+  top: -17px;
+  width: 500px;
+  height: 500px;
+  border-radius: 250px;
+  overflow: hidden;
+  background-color: #28a9e8;
+}
+
+.game-content {
+  position: absolute;
+  left: 17px;
+  top: 17px;
+  width: 466px;
+  height: 466px;
+  overflow: hidden;
+}
+
+.bg-wrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 500px;
+  height: 500px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.bg-img {
+  position: absolute;
+  width: 1094px;
+  height: 500px;
+}
+
+.hud {
+  position: absolute;
+  left: 0;
+  top: 18px;
+  width: 466px;
+  height: 150px;
+  z-index: 50;
+}
+
+.life-bird {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+}
+.life-bird-1 {
+  left: 110px;
+  top: 10px;
+}
+.life-bird-2 {
+  left: 198px;
+  top: 10px;
+}
+.life-bird-3 {
+  left: 286px;
+  top: 10px;
+}
+
+.score {
+  position: absolute;
+  right: 32px;
+  top: 0;
+  width: 100px;
+  height: 32px;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.character {
+  position: absolute;
+  z-index: 15;
+}
+
+.bee {
+  position: absolute;
+  z-index: 10;
+}
+
+.prompt {
+  position: absolute;
+  left: 110px;
+  top: 105px;
+  width: 246px;
+  height: 48px;
+  border-radius: 24px;
+  background-color: rgba(0, 0, 0, 0.65);
+  justify-content: center;
+  align-items: center;
+  z-index: 40;
+}
+
+.prompt-text {
+  color: #ffffff;
+  font-size: 20px;
+  text-align: center;
+}
+
+.controls {
+  position: absolute;
+  left: 65px;
+  bottom: 45px;
+  width: 336px;
+  height: 65px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 40;
+}
+
+.control-btn {
+  width: 70px;
+  height: 60px;
+  border-radius: 30px;
+  background-color: rgba(0, 0, 0, 0.55);
+  justify-content: center;
+  align-items: center;
+}
+
+.run-btn {
+  width: 82px;
+  height: 64px;
+  border-radius: 32px;
+}
+
+.control-text {
+  color: #ffffff;
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.gameover-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 466px;
+  height: 466px;
+  background-color: rgba(0, 0, 0, 0.85);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.gameover-title {
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.gameover-stat {
+  color: #ffffff;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.gameover-note {
+  color: #888888;
+  font-size: 16px;
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+
+.gameover-btn {
+  width: 200px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #4CAF50;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.gameover-btn-secondary {
+  background-color: #555555;
+}
+
+</style>
+
+
+<script>
+
+import router from '@system.router'
+
+import app from '@system.app'
+
+import vibrator from '@system.vibrator'
+
+import storage from '@system.storage'
+
+
+const CHAR_X = 90
+
+const GROUND_Y = 220
+
+const JUMP_HEIGHT = 80
+
+const JUMP_DURATION = 1000
+
+const SQUAT_DURATION = 1000
+
+const OBS_SPEED = 7
+
+const SPAWN_INTERVAL = 4200
+
+const FIRST_SPAWN_DELAY = 1800
+
+const BG_IMG_W = 1094
+
+const BG_TOP = -17
+
+const BG_SPEED = 10
+
+const BG_INTERVAL = 80
+
+const GAME_INTERVAL = 33
+
+const SCORE_INTERVAL = 1000
+
+const RUN_CHECK_INTERVAL = 200
+
+const RUN_TIMEOUT = 3000
+
+
+let lastRunTime = 0
+
+let lastLifeLossTime = 0
+
+let obstacleHit = false
+
+let goResultCalled = false
+
+let avoidCount = 0
+
+let shouldGoHome = false
+
+
+export default {
+
+  data: {
+
+    score: 0,
+
+    life: 3,
+
+    duration: 0,
+
+    charX: CHAR_X,
+
+    charY: GROUND_Y,
+
+    charImg: '/common/images/run1.png',
+
+    charTop: 214,
+
+    charW: 125,
+
+    charH: 198,
+
+    isJumping: false,
+
+    isSquatting: false,
+
+    jumpId: null,
+
+    squatId: null,
+
+    bgOffset: 0,
+
+    bgOffset2: BG_IMG_W,
+
+    bgTop: BG_TOP,
+
+    bgId: null,
+
+    obsX: 490,
+
+    obsY: 372,
+
+    obsW: 40,
+
+    obsH: 40,
+
+    obsVisible: false,
+
+    obsNeedAction: 'jump',
+
+    obsHit: false,
+
+    promptVisible: false,
+
+    promptText: '',
+
+    promptHideId: null,
+
+    gameRunning: false,
+
+    loopId: null,
+
+    scoreId: null,
+
+    spawnId: null,
+
+    firstSpawnId: null,
+
+    runCheckId: null,
+    showGameOver: false,
+    finalScore: 0,
+    finalAvoidCount: 0,
+    finalDuration: 0,
+    finalCalories: 0,
+    fmtDuration: '0:00'
+
+  },
+
+
+  onShow() {
+    if (shouldGoHome) {
+      shouldGoHome = false
+      router.replace({ uri: '/pages/menu' })
+      return
+    }
+    this.startGame()
+  },
+
+  onHide() {
+    if (shouldGoHome) {
+      shouldGoHome = false
+    }
+  },
+
+
+  startGame() {
+
+    this.cleanUp()
+
+    goResultCalled = false
+
+    this.score = 0
+
+    this.showGameOver = false
+
+    this.life = 3
+
+    this.duration = 0
+
+    this.charX = CHAR_X
+
+    this.charY = GROUND_Y
+
+    this.isJumping = false
+
+    this.isSquatting = false
+
+    this.updateCharDisplay()
+
+    this.bgOffset = 0
+
+    this.bgOffset2 = BG_IMG_W
+
+    this.obsX = 490
+
+    this.obsY = 372
+
+    this.obsVisible = false
+
+    this.obsHit = false
+
+    obstacleHit = false
+
+    avoidCount = 0
+
+    this.gameRunning = true
+
+    lastRunTime = Date.now()
+
+    lastLifeLossTime = 0
+
+
+    this.loopId = setInterval(() => {
+
+      if (!this.gameRunning) return
+
+      this.moveObs()
+
+      this.checkHit()
+
+    }, GAME_INTERVAL)
+
+
+    this.bgId = setInterval(() => {
+
+      if (!this.gameRunning) return
+
+      this.moveBackground()
+
+    }, BG_INTERVAL)
+
+
+    this.scoreId = setInterval(() => {
+
+      if (!this.gameRunning) return
+
+      this.duration += 1
+
+      this.score += 1
+
+    }, SCORE_INTERVAL)
+
+
+    this.firstSpawnId = setTimeout(() => {
+
+      if (!this.gameRunning) return
+
+      this.spawnObs()
+
+      this.startSpawn()
+
+    }, FIRST_SPAWN_DELAY)
+
+
+    this.startRunCheck()
+
+  },
+
+
+  updateCharDisplay() {
+
+    if (this.isJumping) {
+
+      this.charImg = '/common/images/jump_transparent.png'
+
+      this.charTop = 140
+
+      this.charW = 96
+
+      this.charH = 162
+
+    } else if (this.isSquatting) {
+
+      this.charImg = '/common/images/squat.png'
+
+      this.charTop = 296
+
+      this.charW = 80
+
+      this.charH = 116
+
+    } else {
+
+      this.charImg = '/common/images/run1.png'
+
+      this.charTop = 214
+
+      this.charW = 125
+
+      this.charH = 198
+
+    }
+
+  },
+
+
+  onRunClick() {
+
+    if (!this.gameRunning) return
+
+    lastRunTime = Date.now()
+
+  },
+
+
+  startRunCheck() {
+
+    this.runCheckId = setInterval(() => {
+
+      if (!this.gameRunning) return
+
+      const now = Date.now()
+
+      const elapsed = now - lastRunTime
+
+      if (elapsed >= RUN_TIMEOUT) {
+
+        if (
+          lastLifeLossTime === 0 ||
+          now - lastLifeLossTime >= RUN_TIMEOUT
+        ) {
+
+          lastLifeLossTime = now
+
+          lastRunTime = now
+
+          this.hit()
+
+        }
+
+      }
+
+    }, RUN_CHECK_INTERVAL)
+
+  },
+
+
+  moveBackground() {
+
+    this.bgOffset -= BG_SPEED
+
+    this.bgOffset2 -= BG_SPEED
+
+    if (this.bgOffset <= -BG_IMG_W) {
+
+      this.bgOffset = this.bgOffset2 + BG_IMG_W
+
+    }
+
+    if (this.bgOffset2 <= -BG_IMG_W) {
+
+      this.bgOffset2 = this.bgOffset + BG_IMG_W
+
+    }
+
+  },
+
+
+  spawnObs() {
+
+    if (!this.gameRunning) return
+
+    if (this.obsVisible) return
+
+    const isHigh = Math.random() > 0.5
+
+    this.obsX = 490
+
+    this.obsW = 40
+
+    this.obsH = 40
+
+    this.obsVisible = true
+
+    this.obsHit = false
+
+    obstacleHit = false
+
+    if (isHigh) {
+
+      this.obsY = 220
+
+      this.obsNeedAction = 'squat'
+
+      this.showPrompt('蹲')
+
+    } else {
+
+      this.obsY = 372
+
+      this.obsNeedAction = 'jump'
+
+      this.showPrompt('跳')
+
+    }
+
+  },
+
+
+  startSpawn() {
+
+    this.spawnId = setInterval(() => {
+
+      if (!this.gameRunning) return
+
+      if (!this.obsVisible) {
+
+        this.spawnObs()
+
+      }
+
+    }, SPAWN_INTERVAL)
+
+  },
+
+
+  moveObs() {
+
+    if (!this.obsVisible) return
+
+    this.obsX -= OBS_SPEED
+
+    if (this.obsX + this.obsW < 0) {
+
+      avoidCount += 1
+
+      this.obsVisible = false
+
+      this.obsX = 490
+
+      this.hidePrompt()
+
+      obstacleHit = false
+
+    }
+
+  },
+
+
+  checkHit() {
+
+    if (!this.gameRunning) return
+
+    if (!this.obsVisible) return
+
+    if (this.obsHit || obstacleHit) return
+
+    const playerLeft = 105
+
+    const playerRight = 150
+
+    const beeLeft = this.obsX + 7
+
+    const beeRight = this.obsX + 33
+
+    if (
+      beeRight < playerLeft ||
+      beeLeft > playerRight
+    ) return
+
+    if (this.obsNeedAction === 'squat') {
+
+      if (this.isSquatting) return
+
+      this.obsHit = true
+
+      obstacleHit = true
+
+      this.hit()
+
+      return
+
+    }
+
+    if (this.obsNeedAction === 'jump') {
+
+      if (this.isJumping) return
+
+      this.obsHit = true
+
+      obstacleHit = true
+
+      this.hit()
+
+    }
+
+  },
+
+
+  onJumpClick() {
+
+    if (!this.gameRunning) return
+
+    if (this.isJumping) return
+
+    if (this.isSquatting) {
+
+      this.isSquatting = false
+
+      if (this.squatId) {
+
+        clearTimeout(this.squatId)
+
+        this.squatId = null
+
+      }
+
+    }
+
+    this.isJumping = true
+
+    this.isSquatting = false
+
+    this.charY = GROUND_Y - JUMP_HEIGHT
+
+    this.updateCharDisplay()
+
+    this.hidePrompt()
+
+    try {
+
+      vibrator.vibrate({
+
+        mode: 'short'
+
+      })
+
+    } catch (e) {}
+
+
+    this.jumpId = setTimeout(() => {
+
+      if (!this.gameRunning) return
+
+      this.isJumping = false
+
+      this.charY = GROUND_Y
+
+      this.updateCharDisplay()
+
+      this.jumpId = null
+
+    }, JUMP_DURATION)
+
+  },
+
+
+  onSquatClick() {
+
+    if (!this.gameRunning) return
+
+    if (this.isSquatting) return
+
+    if (this.isJumping) {
+
+      this.isJumping = false
+
+      if (this.jumpId) {
+
+        clearTimeout(this.jumpId)
+
+        this.jumpId = null
+
+      }
+
+    }
+
+    this.isSquatting = true
+
+    this.isJumping = false
+
+    this.charY = 296
+
+    this.updateCharDisplay()
+
+    this.hidePrompt()
+
+    this.squatId = setTimeout(() => {
+
+      if (!this.gameRunning) return
+
+      this.isSquatting = false
+
+      this.charY = GROUND_Y
+
+      this.updateCharDisplay()
+
+      this.squatId = null
+
+    }, SQUAT_DURATION)
+
+  },
+
+
+  showPrompt(text) {
+
+    this.promptVisible = true
+
+    this.promptText = '准备：' + text
+
+    if (this.promptHideId) {
+
+      clearTimeout(this.promptHideId)
+
+      this.promptHideId = null
+
+    }
+
+    this.promptHideId = setTimeout(() => {
+
+      this.promptVisible = false
+
+      this.promptHideId = null
+
+    }, 1200)
+
+  },
+
+
+  hidePrompt() {
+
+    this.promptVisible = false
+
+    if (this.promptHideId) {
+
+      clearTimeout(this.promptHideId)
+
+      this.promptHideId = null
+    }
+
+  },
+
+
+  hit() {
+
+    if (!this.gameRunning) return
+
+    this.life -= 1
+
+    if (this.life < 0) this.life = 0
+
+    try {
+
+      vibrator.vibrate({
+
+        mode: 'long'
+
+      })
+
+    } catch (e) {}
+
+
+    this.obsVisible = false
+
+    this.obsX = 490
+
+    this.obsHit = true
+
+    obstacleHit = true
+
+    this.hidePrompt()
+
+
+    if (this.life <= 0) {
+
+      this.life = 0
+
+      this.gameRunning = false
+
+      this.cleanUp()
+
+      const mins = Math.floor(this.duration / 60)
+
+      const secs = this.duration % 60
+
+      this.fmtDuration = mins + ':' + (secs < 10 ? '0' : '') + secs
+
+      this.finalScore = this.score
+
+      this.finalAvoidCount = avoidCount
+
+      this.finalDuration = this.duration
+
+      this.finalCalories = Math.max(1, Math.round(this.duration * 0.12))
+
+      try {
+        storage.set({
+          key: 'parkour_last_score',
+          value: JSON.stringify({
+            score: this.finalScore,
+            duration: this.finalDuration,
+            calories: this.finalCalories,
+            avoidCount: this.finalAvoidCount
+          })
+        })
+      } catch (e) {}
+
+      this.showGameOver = true
+
+      return
+
+    }
+
+  },
+
+
+  onPlayAgain() {
+
+    this.showGameOver = false
+
+    goResultCalled = false
+
+    avoidCount = 0
+
+    this.startGame()
+
+  },
+
+
+  onGoHome() {
+
+    this.showGameOver = false
+
+    this.cleanUp()
+
+    router.replace({ uri: '/pages/menu' })
+
+  },
+
+
+  goResult() {
+
+    if (goResultCalled) return
+
+    goResultCalled = true
+
+    this.gameRunning = false
+
+    const finalScore = this.score
+
+    const finalDuration = this.duration
+
+    const finalCalories = Math.max(
+
+      1,
+
+      Math.round(finalDuration * 0.12)
+
+    )
+
+    const finalAvoidCount = avoidCount
+
+    this.cleanUp()
+
+
+    try {
+
+      storage.set({
+
+        key: 'parkour_last_score',
+
+        value: JSON.stringify({
+
+          score: finalScore,
+
+          duration: finalDuration,
+
+          calories: finalCalories,
+
+          avoidCount: finalAvoidCount
+
+        })
+
+      })
+
+    } catch (e) {}
+
+    router.replace({
+      uri: 'pages/result/index',
+      params: {
+        score: String(finalScore),
+        avoidCount: String(finalAvoidCount),
+        duration: String(finalDuration),
+        calories: String(finalCalories)
+      }
+    })
+
+  },
+
+
+  cleanUp() {
+
+    this.gameRunning = false
+
+    if (this.loopId) {
+      clearInterval(this.loopId)
+      this.loopId = null
+    }
+
+    if (this.bgId) {
+      clearInterval(this.bgId)
+      this.bgId = null
+    }
+
+    if (this.scoreId) {
+      clearInterval(this.scoreId)
+      this.scoreId = null
+    }
+
+    if (this.spawnId) {
+      clearInterval(this.spawnId)
+      this.spawnId = null
+    }
+
+    if (this.firstSpawnId) {
+      clearTimeout(this.firstSpawnId)
+      this.firstSpawnId = null
+    }
+
+    if (this.runCheckId) {
+      clearInterval(this.runCheckId)
+      this.runCheckId = null
+    }
+
+    if (this.jumpId) {
+      clearTimeout(this.jumpId)
+      this.jumpId = null
+    }
+
+    if (this.squatId) {
+      clearTimeout(this.squatId)
+      this.squatId = null
+    }
+
+    if (this.promptHideId) {
+      clearTimeout(this.promptHideId)
+      this.promptHideId = null
+    }
+
+  }
+
+}
+
+</script>

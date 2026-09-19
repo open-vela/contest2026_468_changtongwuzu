@@ -1,0 +1,125 @@
+<template>
+  <div class="page">
+    <div class="content">
+      <text class="title">健动跑酷</text>
+      <text class="subtitle">原地体感跑酷 · 燃脂小游戏</text>
+
+      <div class="btn-group">
+        <div class="btn btn-primary" onclick="startGame">
+          <text class="btn-text">开始游戏</text>
+        </div>
+        <div class="btn btn-secondary" onclick="viewHistory">
+          <text class="btn-text">历史最高分</text>
+        </div>
+      </div>
+
+      <text class="disclaimer">卡路里仅估算，不作医疗参考</text>
+    </div>
+  </div>
+</template>
+
+<style>
+.page {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: #000000;
+  padding: 48px 36px;
+}
+
+.content {
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 22px;
+  color: #888888;
+  margin-bottom: 64px;
+}
+
+.btn-group {
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 48px;
+}
+
+.btn {
+  width: 280px;
+  height: 64px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 32px;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background-color: #4CAF50;
+}
+
+.btn-secondary {
+  background-color: #333333;
+}
+
+.btn-text {
+  font-size: 28px;
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+.disclaimer {
+  font-size: 18px;
+  color: #666666;
+  text-align: center;
+}
+</style>
+
+<script>
+import router from '@system.router'
+import storage from '@system.storage'
+
+export default {
+  private: {
+    highScore: 0
+  },
+
+  onInit() {
+    this.loadHighScore()
+  },
+
+  loadHighScore() {
+    storage.get({
+      key: 'high_score',
+      success: (data) => {
+        if (data) {
+          this.highScore = parseInt(data) || 0
+        }
+      },
+      fail: (data, code) => {
+        console.error('读取最高分失败:', code)
+      }
+    })
+  },
+
+  startGame() {
+    router.push({
+      uri: '/pages/prepare'
+    })
+  },
+
+  viewHistory() {
+    router.push({
+      uri: '/pages/history'
+    })
+  }
+}
+</script>
