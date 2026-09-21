@@ -1,0 +1,180 @@
+<template>
+  <div class="page">
+    <div class="content">
+      <text class="title">历史最高分</text>
+
+      <div if="{{hasRecord}}" class="record-card">
+        <div class="record-row">
+          <text class="record-label">最高得分</text>
+          <text class="record-value">{{highScore}}</text>
+        </div>
+        <div class="record-row">
+          <text class="record-label">消耗卡路里</text>
+          <text class="record-value">{{highCalories}}卡</text>
+        </div>
+      </div>
+
+      <div if="{{!hasRecord}}" class="empty">
+        <text class="empty-text">暂无记录</text>
+        <text class="empty-hint">完成一局游戏后将显示</text>
+      </div>
+
+      <div class="btn-container">
+        <div class="btn btn-back" onclick="goBack">
+          <text class="btn-text">返回</text>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+.page {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  padding: 48px 36px;
+}
+
+.content {
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 40px;
+}
+
+.record-card {
+  flex-direction: column;
+  width: 100%;
+  padding: 24px;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  margin-bottom: 40px;
+}
+
+.record-row {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.record-label {
+  font-size: 24px;
+  color: #888888;
+}
+
+.record-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.empty {
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.empty-text {
+  font-size: 24px;
+  color: #666666;
+  margin-bottom: 8px;
+}
+
+.empty-hint {
+  font-size: 18px;
+  color: #444444;
+}
+
+.btn-container {
+  margin-top: 20px;
+}
+
+.btn {
+  width: 200px;
+  height: 56px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 28px;
+}
+
+.btn-back {
+  background-color: #333333;
+}
+
+.btn-text {
+  font-size: 26px;
+  color: #FFFFFF;
+  font-weight: bold;
+}
+</style>
+
+<script>
+import router from '@system.router'
+import storage from '@system.storage'
+
+export default {
+  private: {
+    hasRecord: false,
+    highScore: 0,
+    highCalories: 0
+  },
+
+  onInit() {
+    this.loadHighScore()
+  },
+
+  loadHighScore() {
+    storage.get({
+      key: 'high_score_record',
+      success: (data) => {
+        if (data) {
+          try {
+            var record = JSON.parse(data)
+            this.highScore = record.score || 0
+            this.highCalories = record.calories || 0
+            this.hasRecord = true
+          } catch (e) {}
+        }
+      },
+      fail: (data, code) => {
+        console.error('读取最高分失败:', code)
+      }
+    })
+
+    storage.get({
+      key: 'parkour_last_score',
+      success: (data) => {
+        if (data) {
+          try {
+            var last = JSON.parse(data)
+            if (!this.hasRecord || last.score > this.highScore) {
+              this.highScore = last.score || 0
+              this.highCalories = last.calories || 0
+              this.hasRecord = true
+              storage.set({
+                key: 'high_score_record',
+                value: JSON.stringify({
+                  score: this.highScore,
+                  calories: this.highCalories
+                })
+              })
+            }
+          } catch (e) {}
+        }
+      },
+      fail: (data, code) => {}
+    })
+  },
+
+  goBack() {
+    router.back()
+  }
+}
+</script>

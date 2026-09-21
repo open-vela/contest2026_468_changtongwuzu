@@ -1,0 +1,118 @@
+<template>
+  <div class="page">
+    <div class="content">
+      <text class="title">准备好</text>
+      <text class="countdown">{{countdown}}</text>
+      <text class="subtitle">3秒后开始</text>
+
+      <div class="tips-container">
+        <text class="tip">原地慢跑向前</text>
+        <text class="tip">起跳躲高障碍</text>
+        <text class="tip">下蹲钻低障碍</text>
+      </div>
+
+      <text class="reminder">保持手臂佩戴手表，自然原地运动</text>
+    </div>
+  </div>
+</template>
+
+<style>
+.page {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: #000000;
+  padding: 48px 36px;
+}
+
+.content {
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 12px;
+}
+
+.countdown {
+  font-size: 80px;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 22px;
+  color: #888888;
+  margin-bottom: 24px;
+}
+
+.tips-container {
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.tip {
+  font-size: 20px;
+  color: #AAAAAA;
+  margin-bottom: 6px;
+}
+
+.reminder {
+  font-size: 18px;
+  color: #666666;
+  text-align: center;
+}
+</style>
+
+<script>
+import router from '@system.router'
+
+export default {
+  private: {
+    countdown: 3,
+    countdownTimer: null,
+    sensorReady: false
+  },
+
+  onInit() {
+    this.startCountdown()
+    this.initSensors()
+  },
+
+  onDestroy() {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer)
+      this.countdownTimer = null
+    }
+  },
+
+  startCountdown() {
+    this.countdownTimer = setInterval(() => {
+      this.countdown--
+      if (this.countdown <= 0) {
+        clearInterval(this.countdownTimer)
+        this.countdownTimer = null
+        this.startGame()
+      }
+    }, 1000)
+  },
+
+  initSensors() {
+    // 初始化传感器（仅注册，不开始采集）
+    this.sensorReady = true
+  },
+
+  startGame() {
+    router.replace({
+      uri: '/pages/game'
+    })
+  }
+}
+</script>

@@ -1,0 +1,130 @@
+<template>
+  <div class="page">
+    <div class="content">
+      <text class="title">健动跑酷</text>
+      <text class="subtitle">原地体感跑酷 · 燃脂小游戏</text>
+      <text class="tips">原地慢跑前进｜起跳跳跃｜下蹲钻障碍</text>
+      <div class="progress-container">
+        <div class="progress-bar" style="width: {{progress}}%"></div>
+      </div>
+      <text class="loading-text">加载中...</text>
+    </div>
+  </div>
+</template>
+
+<style>
+.page {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: #000000;
+  padding: 48px 36px;
+}
+
+.content {
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 24px;
+  color: #FFFFFF;
+  margin-bottom: 32px;
+}
+
+.tips {
+  font-size: 20px;
+  color: #888888;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.progress-container {
+  width: 280px;
+  height: 8px;
+  background-color: #333333;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4CAF50;
+  border-radius: 4px;
+}
+
+.loading-text {
+  font-size: 20px;
+  color: #666666;
+}
+</style>
+
+<script>
+import router from '@system.router'
+
+export default {
+  private: {
+    progress: 0,
+    autoJumpTimer: null,
+    progressTimer: null
+  },
+
+  onInit() {
+    this.startLoading()
+  },
+
+  onDestroy() {
+    if (this.autoJumpTimer) {
+      clearTimeout(this.autoJumpTimer)
+      this.autoJumpTimer = null
+    }
+    if (this.progressTimer) {
+      clearInterval(this.progressTimer)
+      this.progressTimer = null
+    }
+  },
+
+  startLoading() {
+    // 模拟加载进度
+    this.progressTimer = setInterval(() => {
+      if (this.progress < 100) {
+        this.progress += 10
+      } else {
+        clearInterval(this.progressTimer)
+        this.progressTimer = null
+        this.navigateToMenu()
+      }
+    }, 150)
+
+    // 1.5秒后自动跳转（如果还没加载完）
+    this.autoJumpTimer = setTimeout(() => {
+      this.navigateToMenu()
+    }, 1800)
+  },
+
+  navigateToMenu() {
+    // 防止重复跳转
+    if (this.autoJumpTimer) {
+      clearTimeout(this.autoJumpTimer)
+      this.autoJumpTimer = null
+    }
+    if (this.progressTimer) {
+      clearInterval(this.progressTimer)
+      this.progressTimer = null
+    }
+
+    router.replace({
+      uri: '/pages/menu'
+    })
+  }
+}
+</script>

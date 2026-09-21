@@ -1,0 +1,68 @@
+<template>
+  <div class="page-container">
+    <div class="run-area">
+      <image class="run-frame" src="/common/images/run/run1.jpg" if="{{currentFrame === 0}}" />
+      <image class="run-frame" src="/common/images/run/run2.jpg" if="{{currentFrame === 1}}" />
+    </div>
+    <text class="status-text">跑步动画演示</text>
+  </div>
+</template>
+
+<style>
+.page-container {
+  flex-direction: column;
+  width: 480px;
+  height: 480px;
+  background-color: #000000;
+  justify-content: center;
+  align-items: center;
+}
+
+.run-area {
+  width: 240px;
+  height: 320px;
+  justify-content: center;
+  align-items: center;
+}
+
+.run-frame {
+  width: 240px;
+  height: 320px;
+  object-fit: contain;
+}
+
+.status-text {
+  font-size: 24px;
+  color: #ffffff;
+  margin-top: 20px;
+}
+</style>
+
+<script>
+export default {
+  private: {
+    currentFrame: 0,
+    animTimer: null
+  },
+  onShow() {
+    this.startAnimation()
+  },
+  onHide() {
+    this.stopAnimation()
+  },
+  onDestroy() {
+    this.stopAnimation()
+  },
+  startAnimation() {
+    this.animTimer = setInterval(() => {
+      this.currentFrame = this.currentFrame === 0 ? 1 : 0
+    }, 200)
+  },
+  stopAnimation() {
+    if (this.animTimer) {
+      clearInterval(this.animTimer)
+      this.animTimer = null
+    }
+  }
+}
+</script>
